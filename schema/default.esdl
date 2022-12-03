@@ -321,28 +321,30 @@ module default {
 
     type Role extending Entity, Named {
         required property permissions -> uint64;
-        # CREATE_MAP_PACKS = 1
-        # CREATE_GAUNTLETS = 2
-        # CREATE_QUESTS = 4
-        # SUGGEST_DEMON = 8
-        # SUGGEST_STARS = 16
-        # CHANGE_SONGS = 32
-        # CHANGE_PASSWORDS = 64
-        # CHANGE_DESCRIPTIONS = 128
-        # RENAME_LEVELS = 256
-        # DELETE_COMMENTS = 512
-        # DAILY_LEVELS = 1024
-        # WEEKLY_LEVELS = 2048
-        # EVENT_LEVELS = 4096
-        # UNLIST_LEVELS = 8192
-        # DELETE_LEVELS = 16384
-        # MOVE_LEVELS = 32768
-        # RATE_LEVELS = 65536
-        # FEATURE_LEVELS = 131072
-        # EPIC_LEVELS = 262144
-        # VERIFY_LEVEL_COMMENTS = 524288
-        # COMMENT_BAN = 1048576
-        # BAN = 2097152
+        # CREATE_MAP_PACKS = 1 << 0
+        # CREATE_GAUNTLETS = 1 << 1
+        # CREATE_QUESTS = 1 << 2
+        # SUGGEST_DEMONS = 1 << 3
+        # SUGGEST_STARS = 1 << 4
+        # CHANGE_SONGS = 1 << 5
+        # CHANGE_PASSWORDS = 1 << 6
+        # CHANGE_DESCRIPTIONS = 1 << 7
+        # RENAME_LEVELS = 1 << 8
+        # DELETE_COMMENTS = 1 << 9
+        # DAILY_LEVELS = 1 << 10
+        # WEEKLY_LEVELS = 1 << 11
+        # EVENT_LEVELS = 1 << 12
+        # UNLIST_LEVELS = 1 << 13
+        # DELETE_LEVELS = 1 << 14
+        # MOVE_LEVELS = 1 << 15
+        # RATE_LEVELS = 1 << 16
+        # FEATURE_LEVELS = 1 << 17
+        # EPIC_LEVELS = 1 << 18
+        # LEGENDARY_LEVELS = 1 << 19
+        # GODLIKE_LEVELS = 1 << 20
+        # COMMENT_BAN = 1 << 21
+        # VERIFY_LEVEL_COINS = 1 << 22
+        # BAN = 1 << 23
         required property assign -> bool {
             default := false;
         };
