@@ -41,6 +41,10 @@ module default {
         constraint min_value(0.0);
     }
 
+    scalar type Color extending uint32 {
+        constraint max_value(16777215);
+    }
+
     scalar type UserCommentID extending sequence;
     scalar type LevelCommentID extending sequence;
     scalar type FriendRequestID extending sequence;
@@ -57,10 +61,16 @@ module default {
         };
     }
 
+    abstract type Colored {
+        required property color -> Color {
+            default := 16777215;  # white
+        };
+    }
+
     abstract type Content {
         required property content -> str {
-            constraint max_len_value(65535);
-        }
+            constraint max_len_value(255);
+        };
     }
 
     abstract type Liked {
@@ -68,9 +78,9 @@ module default {
             property dislike -> bool {
                 default := false;
             };
-        }
+        };
 
-        property rating = sum(select -1 if .likes.@dislike else 1);
+        property rating -> int32 = sum(select -1 if .likes.@dislike else 1);
     }
 
     abstract type Sendable {
@@ -159,16 +169,21 @@ module default {
         constraint max_value(3);
     }
 
+    scalar type RateType extending uint8 {
+        # NOT_RATED = 0
+        # RATED = 1
+        # FEATURED = 2
+        # EPIC = 3
+        # GODLIKE = 4
+        constraint max_value(4);
+    }
+
     type Level extending Entity, Liked, Named {
         required property creator -> User;
         required property song -> Song;
         required property description -> str {
-            constraint max_len_value(65535);
+            constraint max_len_value(255);
             default := "";
-        };
-        required property data -> bytes {
-            constraint max_len_value(16777215);
-            default := b"";
         };
         required property downloads -> uint32 {
             default := 0;
@@ -188,12 +203,12 @@ module default {
         required property requested_stars -> uint8 {
             default := 0;
         };
-        required property score -> Score {
+        required property score -> uint32 {
             default := 0;
         };
-        required property unfeatured -> bool {
-            default := false;
-        };
+        required property rate_type -> RateType {
+            default := 0;
+        }
         required property password -> uint32 {
             constraint max_ex_value(1000000);  # 6 digits
             default := 0;
@@ -238,7 +253,7 @@ module default {
         };
     }
 
-    type MapPack extending Entity {
+    type MapPack extending Colored, Entity {
         required property map_pack_id -> MapPackID;
         required property name -> str;
         required multi link levels -> Level;
@@ -251,14 +266,6 @@ module default {
         };
         required property difficulty -> Difficulty {
             default := 0;
-        };
-        required property primary_color -> uint32 {
-            constraint max_value(16777215);
-            default := 16777215;
-        };
-        required property secondary_color -> uint32 {
-            constraint max_value(16777215);
-            default := 16777215;
         };
     }
 
@@ -313,13 +320,12 @@ module default {
     }
 
     scalar type FriendRequestState extending uint8 {
-        # OPEN_TO_ALL = 0
-        # OPEN_TO_FRIENDS_OF_FRIENDS = 1
-        # CLOSED = 2
-        constraint max_value(2);
+        # OPEN = 0
+        # CLOSED = 1
+        constraint max_value(1);
     }
 
-    type Role extending Entity, Named {
+    type Role extending Colored, Entity, Named {
         required property permissions -> uint64;
         # CREATE_MAP_PACKS = 1 << 0
         # CREATE_GAUNTLETS = 1 << 1
@@ -340,20 +346,12 @@ module default {
         # RATE_LEVELS = 1 << 16
         # FEATURE_LEVELS = 1 << 17
         # EPIC_LEVELS = 1 << 18
-        # LEGENDARY_LEVELS = 1 << 19
-        # GODLIKE_LEVELS = 1 << 20
+        # GODLIKE_LEVELS = 1 << 19
+        # VERIFY_LEVEL_COINS = 1 << 20
         # COMMENT_BAN = 1 << 21
-        # VERIFY_LEVEL_COINS = 1 << 22
-        # BAN = 1 << 23
-        required property assign -> bool {
-            default := false;
-        };
+        # BAN = 1 << 22
         required property badge -> uint32 {
             default := 0;
-        };
-        required property color -> uint32 {
-            constraint max_value(16777215);
-            default := 16777215;
         };
     }
 
@@ -362,7 +360,7 @@ module default {
         required link level -> Level;
         required property difficulty -> Difficulty;
         required property stars -> uint8;
-        required property feature -> bool;
+        required property rate_type -> RateType;
     }
 
     type User extending Entity {
@@ -389,7 +387,7 @@ module default {
         required property user_coins -> uint32 {
             default := 0;
         };
-        required property secret_coins -> uint8 {
+        required property secret_coins -> uint16 {
             default := 0;
         };
         required property creator_points -> uint16 {
