@@ -8,10 +8,6 @@ module default {
         constraint max_value(127);
     }
 
-    scalar type uint8 extending uint16 {
-        constraint max_value(255);
-    }
-
     scalar type uint16 extending int16 {
         constraint min_value(0);
     }
@@ -24,9 +20,13 @@ module default {
         constraint min_value(0);
     }
 
+    scalar type uint8 extending uint16 {
+        constraint max_value(255);
+    }
+
     scalar type int extending bigint;
     scalar type uint extending int {
-        constraint min_value(0);
+        constraint min_value(0n);
     }
 
     scalar type ufloat32 extending float32 {
@@ -38,7 +38,7 @@ module default {
     }
 
     scalar type udecimal extending decimal {
-        constraint min_value(0.0);
+        constraint min_value(0.0n);
     }
 
     scalar type Color extending uint32 {
@@ -80,7 +80,7 @@ module default {
             };
         };
 
-        property rating -> int32 = sum(select -1 if .likes.@dislike else 1);
+        property rating := <int32>sum((select -1 if .likes@dislike else 1));
     }
 
     abstract type Sendable {
@@ -102,7 +102,7 @@ module default {
     }
 
     abstract type Comment extending Content, Entity, Liked {
-        required property author -> User;
+        required link author -> User;
     }
 
     type UserComment extending Comment {
@@ -129,9 +129,12 @@ module default {
         }
     }
 
-    type Gauntlet extending Entity, Named {
-        required property gauntlet_id -> GauntletID;
+    abstract type LevelPack {
         required multi link levels -> Level;
+    }
+
+    type Gauntlet extending Entity, Named, LevelPack {
+        required property gauntlet_id -> GauntletID;
     }
 
     scalar type Length extending uint8 {
@@ -179,8 +182,8 @@ module default {
     }
 
     type Level extending Entity, Liked, Named {
-        required property creator -> User;
-        required property song -> Song;
+        required link creator -> User;
+        required link song -> Song;
         required property description -> str {
             constraint max_len_value(255);
             default := "";
@@ -253,14 +256,13 @@ module default {
         };
     }
 
-    type MapPack extending Colored, Entity {
+    type MapPack extending Colored, Entity, LevelPack {
         required property map_pack_id -> MapPackID;
         required property name -> str;
-        required multi link levels -> Level;
         required property stars -> uint8 {
             default := 0;
         };
-        required property secret_coins -> uint8 {
+        required property coins -> uint8 {
             constraint max_value(3);
             default := 0;
         };

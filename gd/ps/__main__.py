@@ -1,5 +1,5 @@
 from entrypoint import entrypoint
 
-from gd.ps.main import run
+from gd.ps.main import ps
 
-entrypoint(__name__).call(run)
+entrypoint(__name__).call(ps)

@@ -1,4 +1,4 @@
-from gd.enum_extensions import Flag
+from enum import Flag
 
 __all__ = ("Permissions",)
 
